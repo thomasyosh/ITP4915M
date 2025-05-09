@@ -1,0 +1,58 @@
+/* 
+   Tailwind CSS Base, Components, and Utilities 
+   These import Tailwind's default styles, utility classes, and components.
+*/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+   Root variables for theme colors 
+   These define the foreground and background colors used throughout the app.
+*/
+:root {
+  --foreground-rgb: 0, 0, 0; /* Default text color */
+  --background-start-rgb: 214, 219, 220; /* Light grayish background */
+  --background-end-rgb: 255, 255, 255; /* White background */
+}
+
+/* 
+   Dark mode theme variables (Currently commented out)
+   Uncomment if you want to support dark mode.
+*/
+/*
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+*/
+
+/* 
+   Global body styles 
+   Sets the text color dynamically based on the foreground variable.
+*/
+body {
+  color: rgb(var(--foreground-rgb));
+}
+
+/* 
+   Tailwind utility extension 
+   Defines a custom utility class for balanced text wrapping.
+*/
+@layer utilities {
+  .text-balance {
+    text-wrap: balance; /* Improves text readability by balancing line breaks */
+  }
+}
+
+/* 
+   Global scrollbar behavior fix 
+   Ensures that the scrollbar space remains reserved, preventing layout shifts 
+   when elements like dropdowns or modals open.
+*/
+html {
+  scrollbar-gutter: stable; /* Prevents layout shift by reserving space for the scrollbar */
+}
