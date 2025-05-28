@@ -9,3 +9,47 @@ services:
       - "./data:/data/db"
     ports:
       - 27018:27017
+    networks:
+      - db
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+    restart: unless-stopped
+    volumes:
+      - ./frontend/package.json:/opt/package.json
+    ports:
+      - "3000:3000"
+    networks:
+      - db
+    depends_on:
+      - db
+  adminer:
+    container_name: adminerprueba
+    image: dockette/adminer
+    restart: unless-stopped
+    ports:
+      - 8000:80
+    networks:
+      - db
+  db:
+    container_name: db
+    restart: unless-stopped
+    image: postgres:17.5-alpine3.21
+    volumes:
+      - "pgdata:/var/lib/postgresql/data"
+    ports: 
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=strapi
+    networks:
+      - db
+volumes:
+  pgdata:
+
+networks:
+  db:
+    driver: bridge

@@ -1,0 +1,61 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+google-service-key.json
+google-service-key-base64.txt
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# misc
+/scripts
+/src/pages/api/api-test.ts
+data/_mdb_catalog.wt
+data/collection-0-916711113463287226.wt
+data/collection-2-916711113463287226.wt
+data/collection-4-916711113463287226.wt
+data/collection-7-916711113463287226.wt
+data/index-1-916711113463287226.wt
+data/index-3-916711113463287226.wt
+data/index-5-916711113463287226.wt
+data/index-6-916711113463287226.wt
+data/index-8-916711113463287226.wt
+data/index-9-916711113463287226.wt
+data/mongod.lock
+data/sizeStorer.wt
+data/storage.bson
+data/WiredTiger
+data/WiredTiger.lock
+data/WiredTiger.turtle
+data/WiredTiger.wt
+data/WiredTigerHS.wt
