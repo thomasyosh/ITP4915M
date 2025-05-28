@@ -15,5 +15,4 @@ ENV PATH=/opt/node_modules/.bin:$PATH
 WORKDIR /opt/app
 COPY . .
 RUN ["npm", "run", "build"]
-EXPOSE 1337
 CMD ["npm", "run", "dev"]

@@ -19,8 +19,8 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=123456
-    volumes:
-      - "./data:/data/db"
+    # volumes:
+    #   - "./data:/data/db"
     ports:
       - 27018:27017
     networks:
@@ -31,14 +31,14 @@ services:
     build:
       context: ./frontend
     restart: unless-stopped
+    env_file:
+      - ./.env
     volumes:
       - ./frontend/package.json:/opt/package.json
     ports:
       - "3000:3000"
     networks:
       - strapiNetwork
-    depends_on:
-      - db
   adminer:
     container_name: adminerprueba
     image: dockette/adminer
