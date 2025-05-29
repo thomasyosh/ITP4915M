@@ -9,6 +9,7 @@ RUN npm config set strict-ssl false
 # RUN npm config set proxy ${http_proxy}
 # RUN npm config set https-proxy ${http_proxy}
 RUN npm install -g node-gyp
+RUN apk --no-cache --update add --virtual build-dependencies --allow-untrusted
 RUN npm config set fetch-retry-maxtimeout 600000 -g && npm install
 ENV PATH=/opt/node_modules/.bin:$PATH
 
