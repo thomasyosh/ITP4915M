@@ -1,0 +1,15 @@
+{
+  "configurations": [
+    {
+  "name": "Debug Jest",
+  "type": "node",
+  "request": "launch",
+  "cwd": "${workspaceFolder}/frontend",
+  "runtimeExecutable": "npm",
+  "runtimeArgs": ["run-script", "debug"],
+  "address": "localhost",
+  "localRoot": "${workspaceFolder}/frontend",
+  "remoteRoot": "/opt/app"
+},
+  ]
+}
