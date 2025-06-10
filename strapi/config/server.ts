@@ -4,8 +4,4 @@ export default ({ env }) => ({
   app: {
     keys: env.array('APP_KEYS'),
   },
-  url: 'http://strapi/cms',
-  admin: {
-    url: 'http://strapi/dashboard',
-  },
 });

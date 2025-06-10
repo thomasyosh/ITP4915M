@@ -9,7 +9,7 @@ services:
   namecheap-ddns:
     image: joshuamorris3/namecheap-ddns-update
     build:
-      context: ./namecheap-ddns-update
+      context: ./namecheap-ddns
       dockerfile: Dockerfile
     container_name: namecheap_ddns_updater
     restart: unless-stopped

@@ -4,52 +4,123 @@ import type { NextAuthOptions  } from "next-auth"
 import CredentialsProvider from 'next-auth/providers/credentials';
 
 export const authOptions: NextAuthOptions = {
-  providers: [
-    CredentialsProvider({
-      name: 'Strapi',
-      credentials: {
-        identifier: { label: 'Email', type: 'text' },
-        password: { label: 'Password', type: 'password' },
-      },
-      async authorize(credentials) {
-        const res = await fetch(`${process.env.STRAPI_URL}/api/auth/local`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            identifier: credentials?.identifier,
-            password: credentials?.password,
-          }),
-        });
+    providers: [
+        // GoogleProvider({
+        //     clientId: process.env.GOOGLE_CLIENT_ID || '',
+        //     clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+        //     profile: (profile) => {
+        //         return {
+        //             id: profile.sub,
+        //             name: profile.name || 'Anonymous',
+        //             email: profile.email,
+        //             image: profile.picture || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y', // Default image if not provided
+        //         }
+        //     }
+        // }),
+        CredentialsProvider({
+            id: "signin",
+            name: "email and password",
+            credentials: {
+                email: { label: "Email", type: "text" },
+                password: { label: "Password", type: "password" },
+            },
+            async authorize(credentials, req) {
+                if (credentials == null) return null;
+                try {
+                    const { user, jwt } =
+                        (await axios
+                            .post(
+                                `${process.env.NEXT_PUBLIC_API_URL}/api/auth/local`,
+                                {
+                                    identifier: credentials.email,
+                                    password: credentials.password,
+                                }
+                            )
+                            .then((response) => {
+                                return response.data;
+                            })
+                            .catch((error) => {
+                                console.log("error message", error.response);
+                                throw new Error(error.response.data.message);
+                            })) || null;
 
-        const data = await res.json();
+                    return { jwt, ...user };
+                } catch (error) {
+                    console.warn(error);
+                }
+            },
+        }),
+        CredentialsProvider({
+            id: "signup",
+            name: "Register account",
+            credentials: {
+                username: { label: "Username", type: "text" },
+                email: { label: "Email", type: "text" },
+                password: { label: "Password", type: "password" },
+                confirmPassword: { label: "Confirmed Password", type: "password" },
+                
+            },
+            async authorize(credentials, req) {
+                if (credentials?.password !=  credentials?.confirmPassword) {
+                    return null;
+                }
+                
+                try {
+                    const { user, jwt } =
+                        (await axios
+                            .post(
+                                `${process.env.NEXT_PUBLIC_API_URL}/api/auth/local/register`,
+                                {
+                                    username: credentials?.username,
+                                    email: credentials?.email,
+                                    password: credentials?.password
+                                }
+                            )
+                            .then((response) => {
+                                return response.data;
+                            })
+                            .catch((error) => {
+                                console.log("error message", error.response);
+                                throw new Error(error.response.data.message);
+                            })) || null;
 
-        if (!res.ok || !data.user) {
-          throw new Error(data?.error?.message || 'Login failed');
-        }
+                    return { jwt, ...user };
+                } catch (error) {
+                    console.warn(error);
+                }
+            },
+        }),
 
-        return {
-          id: data.user.id,
-          name: data.user.username,
-          email: data.user.email,
-          jwt: data.jwt,
-        };
-      },
-    }),
-  ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-      }
-      return token;
+
+    ],
+    pages :{
+        newUser: '/auth/register',
     },
-    async session({ session, token, user }) {
-      session.user.id = user.id;
-      return session;
-    },
-  },
-  session: { strategy: 'jwt' },
-  secret: process.env.NEXTAUTH_SECRET,
-};
+    callbacks: {
+        async session({ session, token, user }) {
+            // Send properties to the client, like an access_token and user id from a provider.
+            session.user = token.user as any;
+            console.log(session);
+            return session
+        },
 
-export default NextAuth(authOptions);
+        async jwt({ token, user }) {
+            if (user) {
+              token.user = user;
+            }
+            return token;
+          },
+        
+        async redirect({ url, baseUrl }) {
+            // Always redirect to the index page after sign-in, unless the recipe detail page is requested
+            if (url.includes('RecipeDetail')) return url
+            return baseUrl; // this is equivalent to '/'
+        },
+      },
+    session: {
+        maxAge: 60 * 60, // 20 in seconds
+        updateAge: 24 * 60 * 60,
+        strategy: "jwt",
+       },
+}
+export default NextAuth(authOptions)
