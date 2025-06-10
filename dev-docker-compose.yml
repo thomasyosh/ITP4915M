@@ -11,6 +11,17 @@ services:
       - strapiNetwork
     depends_on:
       - frontend
+  
+  namecheap-ddns:
+    image: joshuamorris3/namecheap-ddns-update
+    build:
+      context: ./namecheap-ddns
+      dockerfile: Dockerfile
+    container_name: namecheap_ddns_updater
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - strapiNetwork
 
   frontend:
     container_name: frontend
