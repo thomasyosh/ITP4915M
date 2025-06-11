@@ -34,6 +34,15 @@ services:
       - ./frontend/package.json:/opt/package.json
     ports:
       - "3000:3000"
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend/src
+          target: /opt/app/src
+          ignore:
+            -node_modules/
+        - action: rebuild
+          path: package.json`
     networks:
       - strapiNetwork
 
