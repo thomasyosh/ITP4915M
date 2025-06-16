@@ -1,1 +1,4 @@
 data/*
+certbot/*
+ite4108m_com/*
+.env

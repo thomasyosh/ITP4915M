@@ -22,8 +22,12 @@ services:
     restart: unless-stopped
     volumes:
       - ./default.conf:/etc/nginx/conf.d/default.conf
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+      - ./ite4108m_com:/etc/nginx/certs/
     ports:
       - "80:80"
+      - "443:443"
     networks:
       - strapiNetwork
     depends_on:

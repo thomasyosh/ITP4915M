@@ -1,17 +1,11 @@
 services:
-  nginx:
-    container_name: nginx
-    image: nginx:1.19.4
-    restart: unless-stopped
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
     volumes:
-      - ./default.conf:/etc/nginx/conf.d/default.conf
-    ports:
-      - "80:80"
-    networks:
-      - strapiNetwork
-    depends_on:
-      - frontend
-  
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: ["certonly", "--webroot", "-w", "/var/www/certbot", "--force-renewal", "--email", "thomas.yoshiii@gmail.com", "-d", "cms.ite4108m.com", "--agree-tos"  ]
   namecheap-ddns:
     image: joshuamorris3/namecheap-ddns-update
     build:
@@ -20,6 +14,36 @@ services:
     container_name: namecheap_ddns_updater
     restart: unless-stopped
     env_file: .env
+    networks:
+      - strapiNetwork
+  nginx:
+    container_name: nginx
+    image: nginx:1.19.4
+    restart: unless-stopped
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+      - ./ite4108m_com:/etc/nginx/certs/
+      - ./certbot/conf/:/etc/letsencrypt/
+      - ./certbot/www:/var/www/certbot
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - strapiNetwork
+    depends_on:
+      - frontend
+      - strapi
+  
+  mongo:
+    image: mongo:latest
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=123456
+    volumes:
+      - "./data:/data/db"
+    ports:
+      - 27017:27017
     networks:
       - strapiNetwork
 
@@ -34,15 +58,73 @@ services:
       - ./frontend/package.json:/opt/package.json
     ports:
       - "3000:3000"
-    develop:
-      watch:
-        - action: sync
-          path: ./frontend/src
-          target: /opt/app/src
-          ignore:
-            -node_modules/
-        - action: rebuild
-          path: package.json`
+    networks:
+      - strapiNetwork
+  adminer:
+    container_name: adminerprueba
+    image: dockette/adminer
+    restart: unless-stopped
+    ports:
+      - 8000:80
+    networks:
+      - strapiNetwork
+  
+  strapi:
+    container_name: strapi
+    build:
+      context: ./strapi
+    image: strapi:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_CLIENT: ${DATABASE_CLIENT}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+      APP_KEYS: ${APP_KEYS}
+      NODE_ENV: ${NODE_ENV}
+    volumes:
+      - ./strapi/config:/opt/app/config
+      - ./strapi/src:/opt/app/src
+      - ./strapi/package.json:/opt/package.json
+      - ./strapi/yarn.lock:/opt/yarn.lock
+      - ./.env:/opt/app/.env
+      - ./strapi/public/uploads:/opt/app/public/uploads
+    ports:
+      - "1337:1337"
+    networks:
+      - strapiNetwork
+    depends_on:
+      - db
+  
+  db:
+    container_name: db
+    restart: unless-stopped
+    image: postgres:17.5-alpine3.21
+    volumes:
+      - "pgdata:/var/lib/postgresql/data"
+    ports: 
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=strapi
+    networks:
+      - strapiNetwork
+
+  mongo-express:
+    image: mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: 123456
     networks:
       - strapiNetwork
 
