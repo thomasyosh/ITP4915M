@@ -31,7 +31,6 @@ services:
     networks:
       - strapiNetwork
     depends_on:
-      - frontend
       - strapi
   
   mongo:
@@ -47,15 +46,29 @@ services:
     networks:
       - strapiNetwork
 
-  frontend:
-    container_name: frontend
+  # frontend:
+  #   container_name: frontend
+  #   build:
+  #     context: ./frontend
+  #   restart: unless-stopped
+  #   env_file:
+  #     - ./.env
+  #   volumes:
+  #     - ./frontend/package.json:/opt/package.json
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - strapiNetwork
+
+  recipe_generator:
+    container_name: recipe_generator
     build:
-      context: ./frontend
+      context: ./recipe_generator
     restart: unless-stopped
     env_file:
       - ./.env
     volumes:
-      - ./frontend/package.json:/opt/package.json
+      - ./recipe_generator/package.json:/opt/package.json
     ports:
       - "3000:3000"
     networks:
