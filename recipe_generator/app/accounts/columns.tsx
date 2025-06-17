@@ -6,16 +6,24 @@ import { MoreHorizontal } from "lucide-react"
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
-export type Payment = {
+export type Account = {
   id: string
-  amount: number
-  status: "pending" | "processing" | "success" | "failed"
+  documentId: string
+  username: string
   email: string
+  provider: string
+  confirmed: boolean
+  createdAt: Date
+  updatedAt: Date
+  publishedAt: Date
 }
 
-export const columns: ColumnDef<Payment>[] = [
+
+
+
+export const columns: ColumnDef<Account>[] = [
   {
-    id: "actions",
+    id: "documentId",
     cell: ({ row }) => {
       const payment = row.original
  
@@ -30,7 +38,7 @@ export const columns: ColumnDef<Payment>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
+              onClick={() => {navigator.clipboard.writeText(payment.documentId);}}
             >
               Copy payment ID
             </DropdownMenuItem>
@@ -41,15 +49,24 @@ export const columns: ColumnDef<Payment>[] = [
         </DropdownMenu>
       )
     },
-    accessorKey: "status",
-    header: "Statusss",
+    accessorKey: "documentId",
+    header: "ID",
+  },
+  {
+    accessorKey: "username",
+    header: "User name",
   },
   {
     accessorKey: "email",
     header: "Email",
   },
   {
-    accessorKey: "amount",
-    header: "Amount",
+    accessorKey: "createdAt",
+    header: "Registered At",
   },
+  {
+    accessorKey: "confirmed",
+    header: "Active user",
+  },
+
 ]
